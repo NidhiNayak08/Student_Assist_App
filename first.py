@@ -258,7 +258,7 @@ def load_frame2():
         tk.Label(second_frame, text="Redirecting to maths study material...", bg="orange", fg="white",font=("Shanti", 10),
             height=2, borderwidth=2, relief="solid").pack(anchor="w")
         speaker.say("Redirecting to maths study material")
-        webbrowser.open("http://www.example.com")
+        webbrowser.open("https://drive.google.com/drive/folders/1N1ZotoYd-7vk5wG1QJXozwWQYG7hrV7V?usp=share_link")
         speaker.runAndWait()
 
 
@@ -266,7 +266,7 @@ def load_frame2():
         tk.Label(second_frame, text="Redirecting to COA study material...", bg="orange", fg="white",font=("Shanti", 10),
             height=2, borderwidth=2, relief="solid").pack(anchor="w")
         speaker.say("Redirecting to COA study material")
-        webbrowser.open("http://www.example.com")
+        webbrowser.open("https://drive.google.com/drive/folders/144JDfA-Xkpq8JIV8HvBPiHLKhlBo_Ymz?usp=share_link")
         speaker.runAndWait()
 
 
@@ -274,7 +274,7 @@ def load_frame2():
         tk.Label(second_frame, text="Redirecting to Computer networks study material...", bg="orange", fg="white",font=("Shanti", 10),
             height=2, borderwidth=2, relief="solid").pack(anchor="w")
         speaker.say("Redirecting to Computer networks study material")
-        webbrowser.open("http://www.example.com")
+        webbrowser.open("https://drive.google.com/drive/folders/1lPfelUppby60W-ntNzRhjXqti5b4bN3E?usp=share_link")
         speaker.runAndWait()
 
 
@@ -282,7 +282,7 @@ def load_frame2():
         tk.Label(second_frame, text="Redirecting to automata theory study material...", bg="orange", fg="white",font=("Shanti", 10),
             height=2, borderwidth=2, relief="solid").pack(anchor="w")
         speaker.say("Redirecting to Automata theory study material")
-        webbrowser.open("http://www.example.com")
+        webbrowser.open("https://drive.google.com/drive/folders/1mydvkIB0V5ulXEZH5vi8N7sJLHVxjNVJ?usp=share_link")
         speaker.runAndWait()
 
 
@@ -290,7 +290,7 @@ def load_frame2():
         tk.Label(second_frame, text="Redirecting to operating systems study material...", bg="orange", fg="white",font=("Shanti", 10),
             height=2, borderwidth=2, relief="solid").pack(anchor="w")
         speaker.say("Redirecting to Operating systems study material")
-        webbrowser.open("http://www.example.com")
+        webbrowser.open("https://drive.google.com/drive/folders/1C4OCl6PN_3m4QpJkYBj6xo3EpOL3PYeT?usp=share_link")
         speaker.runAndWait()
 
     def time_table():
@@ -396,7 +396,7 @@ def load_frame2():
         '<Configure>', lambda e: my_canvas.configure(scrollregion=my_canvas.bbox("all"))
     )
 
-    second_frame = Frame(my_canvas, width = 700, height = 600)
+    second_frame = Frame(my_canvas, width = 700, height = 6000)
     my_canvas.create_window((60, 0), window=second_frame, anchor="n")
 
 
@@ -793,7 +793,7 @@ for frame in (frame1, frame2, frame3, frame4, frame5, frame6, frame7):
     frame.grid(row=0, column=0, sticky="nesw")
 
 # load the first frame
-load_frame7()
+load_frame1()
 
 
 # run app
