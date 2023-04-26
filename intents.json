@@ -1,0 +1,39 @@
+{"intents":
+[   
+    {"tag": "greeting",
+     "patterns": ["Hi", "Hey", "Hello", "Whats up", "Good morning", "Good afternoon", "Good evening"],
+     "responses": ["Hello!! How can i help you?", "Hey, what can i do for you?", "Hi, how can i help you?"]
+    },
+    {"tag": "create_memo",
+     "patterns": ["create a new memo", "New memo", "Create a memo", "I want to create a memo"],
+     "responses": [""]
+    },
+    {"tag": "math",
+     "patterns": ["math resources","maths resources" ,"maths study material", "math material", "maths books", "math notes"],
+     "responses": [""]
+    },
+    {"tag": "coa",
+     "patterns": ["computer organisation resources" ,"COA study material", "computer organisation and architecture material", "computer organization notes", "computer organization and architecture notes"],
+     "responses": [""]
+    },
+    {"tag": "cn",
+     "patterns": ["computer netwoks resources","network resources" ,"CN study material", "networks material", "computer networks books", "computer networks notes"],
+     "responses": [""]
+    },
+    {"tag": "automata",
+     "patterns": ["automata resources","automata theory resources" ,"automata theory material", "automata material", "automata theory books", "automata theory notes"],
+     "responses": [""]
+    },
+    {"tag": "os",
+     "patterns": ["operating systems resources","operating systems resources" ,"operating system material", "operating system material", "operating systems theory books", "operating systems notes"],
+     "responses": [""]
+    },
+    {"tag": "timetable",
+     "patterns": ["whats my time table","show time table" ,"show my timetable", "fetch time table", "display my timetable"," wheres my timetable"],
+     "responses": [""]
+    },
+    {"tag": "exit",
+     "patterns": ["Bye", "Quit", "I want to exit", "Goodbye", "I want to quit", "I have to go"],
+     "responses": [""]
+    }
+]}
