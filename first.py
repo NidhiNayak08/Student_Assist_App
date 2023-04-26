@@ -1,7 +1,6 @@
 import tkinter as tk
 from PIL import ImageTk
 from numpy import random
-import pyglet
 from neuralintents import GenericAssistant
 import speech_recognition
 import pyttsx3 as tts
@@ -17,12 +16,13 @@ from plyer import notification
 from tkinter import messagebox
 from PIL import Image, ImageTk
 import time
-import mysql.connector
+from math import *
 from tkinter import Tk
+import sqlite3
+from prettytable import PrettyTable
 import tkinter.messagebox as mymessagebox
 
 bg_colour = "#3d6466"
-calculation = ""
 recognizer = speech_recognition.Recognizer()
 
 speaker = tts.init()
@@ -35,13 +35,53 @@ root.title("Study Assist")
 root.geometry("700x650")
  
 # create a frame widgets
+frame0 = tk.Frame(root, width=700, height=650, bg=bg_colour)
 frame1 = tk.Frame(root, width=700, height=650, bg=bg_colour)
 frame2 = tk.Frame(root, width=700, height=650, bg=bg_colour)
 frame3 = tk.Frame(root, width=700, height=650, bg=bg_colour)
 frame4 = tk.Frame(root, width=700, height=650, bg=bg_colour)
 frame5 = tk.Frame(root, width=700, height=650, bg=bg_colour)
 frame6 = tk.Frame(root, width=700, height=650, bg=bg_colour)
-frame7 = tk.Frame(root, width=700, height=650, bg=bg_colour)
+
+
+#frame for the login page 
+def load_frame0():
+    frame0.tkraise()
+
+    def login():
+        username = username_entry.get()
+        password = password_entry.get()
+
+        conn = sqlite3.connect('users.db')
+        c = conn.cursor()
+
+        c.execute('SELECT * FROM userlogin WHERE username=? AND password=?', (username, password))
+        user = c.fetchone()
+
+        if user is not None:
+            message_label.config(text='Login successful')
+            load_frame1()
+        else:
+            message_label.config(text='Login failed')
+
+        conn.close()
+
+    username_label = tk.Label(frame0, text='Username')
+    username_label.pack()
+    username_entry = tk.Entry(frame0)
+    username_entry.pack()
+
+    password_label = tk.Label(frame0, text='Password')
+    password_label.pack()
+    password_entry = tk.Entry(frame0, show='*')
+    password_entry.pack()
+
+    login_button = tk.Button(frame0, text='Login', command=lambda : login())
+    login_button.pack()   
+
+    message_label = tk.Label(frame0, text='')
+    message_label.pack()
+
 
 
 
@@ -193,7 +233,6 @@ def load_frame1():
         fg="white",
         font=("Shanti", 14)
         ).place(x=540, y=300)
-
 
 
 
@@ -428,65 +467,73 @@ def load_frame2():
 def load_frame3():
     frame3.tkraise()
     
-    def add_to_calculation(symbol):
-        global calculation 
-        calculation += str(symbol)
-        text_result.delete(1.0, "end")
-        text_result.insert(1.0, calculation)
+    class Calculator:
+        def __init__(self, master):
+            self.master = master
 
-    def evaluate_calculation():
-        global calculation
-        try:
-            calculation = str(eval(calculation))
-            text_result.delete(1.0, "end")
-            text_result.insert(1.0, calculation)
-        except:
-            clear_field()
-            text_result.insert(1.0, "Error")
+            # Create the entry field for the calculator
+            self.entry = tk.Entry(master, width=35, borderwidth=5, font=("Arial", 20), justify="right")
+            self.entry.grid(row=0, column=0, columnspan=5, padx=10, pady=10)
 
-    def clear_field():
-        global calculation
-        calculation = ""
-        text_result.delete(1.0, "end")
+            # Create buttons for the calculator
+            self.create_button("sin", 1, 0)
+            self.create_button("cos", 1, 1)
+            self.create_button("tan", 1, 2)
+            self.create_button("(", 1, 3)
+            self.create_button(")", 1, 4)
 
-    text_result = tk.Text(frame3, height=2, width=18, font=("Arial", 24))
-    text_result.grid(padx=10, pady=20, columnspan=5)
-    btn_1 = tk.Button(frame3, text="1", command=lambda: add_to_calculation(1), width=5, font=("Arial", 14))
-    btn_1.grid(row=2, column=1)
-    btn_2 = tk.Button(frame3, text="2", command=lambda: add_to_calculation(2), width=5, font=("Arial", 14))
-    btn_2.grid(row=2, column=2)
-    btn_3 = tk.Button(frame3, text="3", command=lambda: add_to_calculation(3), width=5, font=("Arial", 14))
-    btn_3.grid(row=2, column=3)
-    btn_4 = tk.Button(frame3, text="4", command=lambda: add_to_calculation(4), width=5, font=("Arial", 14))
-    btn_4.grid(row=3, column=1)
-    btn_5 = tk.Button(frame3, text="5", command=lambda: add_to_calculation(5), width=5, font=("Arial", 14))
-    btn_5.grid(row=3, column=2)
-    btn_6 = tk.Button(frame3, text="6", command=lambda: add_to_calculation(6), width=5, font=("Arial", 14))
-    btn_6.grid(row=3, column=3)
-    btn_7 = tk.Button(frame3, text="7", command=lambda: add_to_calculation(7), width=5, font=("Arial", 14))
-    btn_7.grid(row=4, column=1)
-    btn_8 = tk.Button(frame3, text="8", command=lambda: add_to_calculation(8), width=5, font=("Arial", 14))
-    btn_8.grid(row=4, column=2)
-    btn_9 = tk.Button(frame3, text="9", command=lambda: add_to_calculation(9), width=5, font=("Arial", 14))
-    btn_9.grid(row=4, column=3)
-    btn_0 = tk.Button(frame3, text="0", command=lambda: add_to_calculation(0), width=5, font=("Arial", 14))
-    btn_0.grid(row=5, column=2)
-    btn_plus = tk.Button(frame3, text="+", command=lambda: add_to_calculation("+"), width=5, font=("Arial", 14))
-    btn_plus.grid(row=2, column=4)
-    btn_minus = tk.Button(frame3, text="-", command=lambda: add_to_calculation("-"), width=5, font=("Arial", 14))
-    btn_minus.grid(row=3, column=4)
-    btn_mult = tk.Button(frame3, text="*", command=lambda: add_to_calculation("*"), width=5, font=("Arial", 14))
-    btn_mult.grid(row=4, column=4)
-    btn_div = tk.Button(frame3, text="/", command=lambda: add_to_calculation("/"), width=5, font=("Arial", 14))
-    btn_div.grid(row=5, column=4)
-    btn_open = tk.Button(frame3, text="(", command=lambda: add_to_calculation("("), width=5, font=("Arial", 14))
-    btn_open.grid(row=5, column=1)
-    btn_close = tk.Button(frame3, text=")", command=lambda: add_to_calculation(")"), width=5, font=("Arial", 14))
-    btn_close.grid(row=5, column=3)
-    btn_clear = tk.Button(frame3, text="Clear", command=clear_field, width=10, font=("Arial", 14))
-    btn_clear.grid(row=6, column=1, columnspan=2)
-    btn_equals = tk.Button(frame3, text="=", command=evaluate_calculation, width=5, font=("Arial", 14))
-    btn_equals.grid(row=6, column=3, columnspan=2)
+            self.create_button("7", 2, 0)
+            self.create_button("8", 2, 1)
+            self.create_button("9", 2, 2)
+            self.create_button("/", 2, 3)
+            self.create_button("C", 2, 4)
+
+            self.create_button("4", 3, 0)
+            self.create_button("5", 3, 1)
+            self.create_button("6", 3, 2)
+            self.create_button("*", 3, 3)
+            self.create_button("sqrt", 3, 4)
+
+            self.create_button("1", 4, 0)
+            self.create_button("2", 4, 1)
+            self.create_button("3", 4, 2)
+            self.create_button("-", 4, 3)
+            self.create_button("^", 4, 4)
+
+            self.create_button(".", 5, 0)
+            self.create_button("0", 5, 1)
+            self.create_button("=", 5, 2)
+            self.create_button("+", 5, 3)
+
+        def create_button(self, text, row, col):
+            button = tk.Button(self.master, text=text, padx=30, pady=20, command=lambda: self.button_click(text))
+            button.grid(row=row, column=col)
+
+        def button_click(self, text):
+            if text == "C":
+                self.entry.delete(0, tk.END)
+            elif text == "=":
+                try:
+                    result = eval(self.entry.get())
+                    self.entry.delete(0, tk.END)
+                    self.entry.insert(0, result)
+                except:
+                    self.entry.delete(0, tk.END)
+                    self.entry.insert(0, "Error")
+            elif text == "sqrt":
+                try:
+                    result = sqrt(float(self.entry.get()))
+                    self.entry.delete(0, tk.END)
+                    self.entry.insert(0, result)
+                except:
+                    self.entry.delete(0, tk.END)
+                    self.entry.insert(0, "Error")
+            elif text == "^":
+                self.entry.insert(tk.END, "**")
+            elif text in ["sin", "cos", "tan"]:
+                self.entry.insert(tk.END, f"{text}(")
+            else:
+                self.entry.insert(tk.END, text)
 
     # 'back' button widget
     tk.Button(
@@ -497,7 +544,10 @@ def load_frame3():
         fg="white",
         cursor="hand2",
         command=lambda:load_frame1()
-        ).place(x=505, y= 45)
+        ).place(x=555, y= 455)
+    
+    global calculator 
+    calculator = Calculator(frame3)
 
 
 # frame for to do
@@ -617,7 +667,7 @@ def load_frame5():
         fg="white",
         cursor="hand2",
         command=lambda:load_frame1()
-        ).place(x=505, y= 45)
+        ).place(x=505, y= 345)
 
 
 
@@ -700,100 +750,13 @@ def load_frame6():
     frame6.resizable(0,0)
 
 
-# frame for login page
-def load_frame7():
-    frame7.tkraise()
-    mydb = mysql.connector.connect(
-    host = "localhost",
-    user = "root",
-    passwd = "123456",
-    database= "python_database"
-    )
-    # mycursor = mydb.cursor()
-    # mycursor.execute("CREATE DATABASE python_database")
-    class Form(tk.Frame):
-
-        def __init__(self,parent):
-
-            tk.Frame.__init__(self,parent)
-            self.parent = parent
-            self.initialize_interface()
-
-        def initialize_interface(self):
-
-            self.parent.title("Login") # title of the form
-            self.parent.config(background="lavender") # background color
-            self.parent.geometry("800x500") # size of the form
-            self.parent.resizable(False,False) # disables resize of hegiht and width
-
-            global username #our variables
-            global password #we use global for the other function to use it
-
-            username = tk.StringVar() # we indicate what type of variables we declared 
-            password = tk.StringVar() #which is string type
-
-            self.labelUser = tk.Label(self.parent,text="Username: ", background = "dark slate gray", foreground = "White", font="Arial 8 bold")
-            self.labelUser.place(x=25,y=25)
-
-            self.entryUser = tk.Entry(self.parent,textvariable=username)
-            self.entryUser.place(x=100,y=25)
-
-            self.labelPass = tk.Label(self.parent,text="Password: ", background = "dark slate gray", foreground = "White", font="Arial 8 bold")
-            self.labelPass.place(x=25,y=50)
-
-            self.entryPass = tk.Entry(self.parent,textvariable=password)
-            self.entryPass.place(x=100,y=50)
-            self.entryPass.config(show="*");
-
-            self.buttonLogin = tk.Button(self.parent,text="LOGIN", font = "Arial 8 bold",command=lambda: load_frame1())
-            self.buttonLogin.place(height=45,width=60 ,x=230,y=25)
-
-    def logs():
-        mycursor = mydb.cursor()
-    
-        sql = "SELECT * FROM login WHERE username = '%s' AND password = '%s'" % (username.get(),password.get())
-
-        mycursor.execute(sql)
-
-        if mycursor.fetchone():
-
-            # print("Successfully")
-            mymessagebox.showinfo("Success", "Successfully Login")
-
-        else:
-
-            # print("Invalid Credentials")
-            mymessagebox.showerror("Error", "Invalid User Name And Password")
-        
-        # mycursor.execute("SELECT * FROM login where usrname = '"+ username.get() +"' and passwrd = '"+ password.get() +"';")
-        # myresult = mycursor.fetchone()
-        # if myresult==None:
-        #    mymessagebox.showerror("Error", "Invalid User Name And Password")
-
-        # else:
-        #    mymessagebox.showinfo("Success", "Successfully Login")
-                
-        # mydb.close()
-        # mycursor.close()
-
-    def main():
-
-        root = tk.Tk()
-        b= Form(root)
-        b.mainloop()
-
-
-    if __name__ == "__main__":
-        main()
-
-
 
 # place frame widgets in window
-for frame in (frame1, frame2, frame3, frame4, frame5, frame6, frame7):
+for frame in (frame0, frame1, frame2, frame3, frame4, frame5, frame6):
     frame.grid(row=0, column=0, sticky="nesw")
 
 # load the first frame
-load_frame1()
+load_frame0()
 
 
 # run app
