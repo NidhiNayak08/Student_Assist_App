@@ -32,6 +32,10 @@
      "patterns": ["whats my time table","show time table" ,"show my timetable", "fetch time table", "display my timetable"," wheres my timetable"],
      "responses": [""]
     },
+    {"tag": "syllabus",
+    "patterns": ["whats my syllabus","show my syllabus" ,"show syllabus ", "fetch syllabus", "display syllabus"," syllabus "],
+    "responses": [""]
+   },
     {"tag": "exit",
      "patterns": ["Bye", "Quit", "I want to exit", "Goodbye", "I want to quit", "I have to go"],
      "responses": [""]

@@ -21,6 +21,7 @@ from tkinter import Tk
 import sqlite3
 from prettytable import PrettyTable
 import tkinter.messagebox as mymessagebox
+import tkinter.ttk as ttk
 
 bg_colour = "#3d6466"
 recognizer = speech_recognition.Recognizer()
@@ -49,6 +50,7 @@ def load_frame0():
     frame0.tkraise()
 
     def login():
+        global username
         username = username_entry.get()
         password = password_entry.get()
 
@@ -363,6 +365,14 @@ def load_frame2():
         speaker.runAndWait()
 
 
+    def syllabus():
+        tk.Label(second_frame, text="Opening your syllabus PDF", bg="orange", fg="white",font=("Shanti", 10),
+            height=2, borderwidth=2, relief="solid").pack(anchor="w")
+        speaker.say("Opening your syllabus PDF")
+        webbrowser.open("http://localhost:8000/Syllabus_SecondYear.pdf")
+        speaker.runAndWait()
+
+
     def hello():
         greet_reply = ["Hello. What can i do for you?", "Hey, How can i help you?", "Hi, how may i help you?"]
         msg1 = random.choice(greet_reply)
@@ -391,6 +401,7 @@ def load_frame2():
         "automata": automata_material,
         "os": os_material,
         "timetable" : time_table,
+        "syllabus" : syllabus,
         "exit": quit
     }    
 
@@ -472,7 +483,7 @@ def load_frame3():
             self.master = master
 
             # Create the entry field for the calculator
-            self.entry = tk.Entry(master, width=35, borderwidth=5, font=("Arial", 20), justify="right")
+            self.entry = tk.Entry(master, width=35, borderwidth=5, font=("Arial", 20), justify="left")
             self.entry.grid(row=0, column=0, columnspan=5, padx=10, pady=10)
 
             # Create buttons for the calculator
@@ -554,66 +565,138 @@ def load_frame3():
 def load_frame4():
     frame4.tkraise()
 
-    class ToDoList:
-        def __init__(self):
-            self.tasks = []
-            
-            self.task_var = tk.StringVar()
-            self.task_entry = tk.Entry(frame4, textvariable=self.task_var, width=40)
-            self.task_entry.grid(row=0, column=0, padx=5, pady=5)
-            add_task_button = tk.Button(frame4, text="Add Task", command=self.add_task)
-            add_task_button.grid(row=0, column=1, padx=5, pady=5)
-            
-            self.task_list = tk.Listbox(frame4, height=15, width=50)
-            self.task_list.grid(row=1, column=0, columnspan=2, padx=5, pady=5)
-            
-            self.delete_button = tk.Button(frame4, text="Delete Task", command=self.delete_task)
-            self.delete_button.grid(row=2, column=0, padx=5, pady=5)
-            
-            self.complete_button = tk.Button(frame4, text="Mark as Complete", command=self.complete_task)
-            self.complete_button.grid(row=2, column=1, padx=5, pady=5)
+    # Function to add a new customer to the tasks table
+    def add_task():
+        # Prompt the user for input
+        task = input_task.get()
+        status = "incomplete"
         
-        def add_task(self):
-            task = self.task_var.get()
-            if task:
-                self.tasks.append(task)
-                self.task_list.insert(tk.END, task)
-                self.task_var.set("")
+        # Connect to the database
+        conn = sqlite3.connect('tododatabase.db')
+
+        # Create a cursor object
+        cur = conn.cursor()
+
+        # Insert the new row into the database
+        cur.execute("INSERT INTO {} (task, status) VALUES (?, ?)".format(username), (task, status))
+        conn.commit()
         
-        def delete_task(self):
-            task_index = self.task_list.curselection()
-            if task_index:
-                task_index = task_index[0]
-                self.tasks.pop(task_index)
-                self.task_list.delete(task_index)
+        # Update the treeview widget with the new row
+        row_id = cur.lastrowid
+        table_tv.insert('', 'end', text="*", values=(task, status))
         
-        def complete_task(self):
-            task_index = self.task_list.curselection()
-            if task_index:
-                task_index = task_index[0]
-                self.task_list.itemconfig(task_index, fg="gray")
-                self.task_list.selection_clear(task_index)
+        # Clear the input fields
+        input_task.delete(0, tk.END)
+
+        # Close the connection
+        conn.close()
+
+
+    # Define a function to remove a row from the database
+    def remove_task():
+        # Connect to the database
+        conn = sqlite3.connect('tododatabase.db')
+
+        # Create a cursor object
+        cur = conn.cursor()
+
+        # Get the selected item from the Treeview widget
+        selected_item = table_tv.selection() 
+        if not selected_item:
+            return
+
+        # Get the task name of the selected task
+        taskselect = table_tv.item(selected_item)['values'][0]
         
-    ToDoList()
-    class ToDoList:
-        def __init__(self):
-            self.tasks = []
-            self.task_vars = []
-            self.window = tk.Tk()
-            self.window.title("Student Assistant - To-Do List")
-            
-            self.task_var = tk.StringVar()
-            self.task_entry = tk.Entry(self.window, textvariable=self.task_var, width=40)
-            self.task_entry.grid(row=0, column=0, padx=5, pady=5)
-            add_task_button = tk.Button(self.window, text="Add Task", command=self.add_task)
-            add_task_button.grid(row=0, column=1, padx=5, pady=5)
-            
-            self.task_list = tk.Frame(self.window)
-            self.task_list.grid(row=1, column=0, columnspan=2, padx=5, pady=5)
-            
-            self.delete_button = tk.Button(self.window, text="Delete Task", command=self.delete_task)
-            self.delete_button.grid(row=2, column=0, padx=5, pady=5)
-        # 'back' button widget
+        # Remove the task from the database
+        cur.execute("DELETE FROM {} WHERE task=?".format(username), (taskselect,))
+        conn.commit()
+        
+        # Remove the selected item from the Treeview widget
+        table_tv.delete(selected_item)
+
+        # Close the connection
+        conn.close()
+        
+
+
+    # Function to update a task
+    def complete_task():
+        # Connect to the database
+        conn = sqlite3.connect('tododatabase.db')
+        # Create a cursor object
+        cur = conn.cursor()
+
+        # Get the selected item from the Treeview widget
+        selected_item = table_tv.selection()
+        if not selected_item:
+            return
+        
+        # Get the values from the Entry widgets
+        status = "complete"
+        
+        # Get the ID of the selected task
+        task_id = table_tv.item(selected_item)['values'][0]
+        
+        # Update the task in the database
+        cur.execute("UPDATE {} SET status=? WHERE task=?".format(username), (status, task_id))
+        conn.commit()
+        
+        # Update the selected item in the Treeview widget
+        table_tv.item(selected_item, values=(task_id, status))
+
+        # Close the connection
+        conn.close()
+
+
+
+    # Connect to the database
+    conn = sqlite3.connect('tododatabase.db')
+
+    # Create a cursor object
+    cur = conn.cursor()
+
+    # Select all rows from the tasks table
+    cur.execute("SELECT * FROM {}".format(username))
+    rows = cur.fetchall()
+
+    # Create a treeview widget to display the tasks table data
+    table_tv = ttk.Treeview(frame4, columns=('ID','Task', 'Status'))
+    table_tv.heading('#0', text=' ')
+    table_tv.heading('#1', text='Task')
+    table_tv.heading('#2', text='Status')
+    for row in rows:
+        table_tv.insert('', 'end', text="*", values=(row[0],row[1]))
+    table_tv.pack()
+
+    # Create a frame with input fields for adding a new task
+    input_frame = ttk.Frame(frame4)
+    input_frame.pack(padx=10, pady=10)
+
+    input_task_label = ttk.Label(input_frame, text='Task:')
+    input_task_label.grid(row=0, column=0, padx=5, pady=5)
+
+    input_task = ttk.Entry(input_frame)
+    input_task.grid(row=0, column=1, padx=5, pady=5)
+
+    input_button = ttk.Button(input_frame, text='Add task', command=add_task)
+    input_button.grid(row=2, column=1, padx=5, pady=5)
+
+    # Create a button to remove a row
+    remove_button = ttk.Button(input_frame, text="Remove task", command=remove_task)
+    remove_button.grid(row=2, column=2, padx=5, pady=5)
+
+    # Create a button to update a task
+    update_btn = ttk.Button(input_frame, text="Complete task", command=complete_task)
+    update_btn.grid(row=2, column=3, padx=5, pady=5)
+
+    # Close the connection
+    conn.close()
+
+    input_task_label = ttk.Label(frame4, text=' ', background= bg_colour)
+    input_task_label.place(height=400, width=700, x=0, y= 310)
+
+    #'back' button widget
     tk.Button(
         frame4,
         text="BACK",
@@ -622,7 +705,7 @@ def load_frame4():
         fg="white",
         cursor="hand2",
         command=lambda:load_frame1()
-        ).place(x=505, y= 45)   
+        ).place(x=505, y= 345)   
        
 
 
@@ -658,6 +741,9 @@ def load_frame5():
     tree.insert('', 'end', text="13", values=('Commencement of New Term ', '10th July 23'))
     tree.pack()
 
+    input_task_label = ttk.Label(frame5, text=' ', background= bg_colour)
+    input_task_label.place(height=600, width=700, x=0, y= 205)
+
     # 'back' button widget
     tk.Button(
         frame5,
@@ -667,7 +753,7 @@ def load_frame5():
         fg="white",
         cursor="hand2",
         command=lambda:load_frame1()
-        ).place(x=505, y= 345)
+        ).place(x=505, y= 245)
 
 
 
@@ -757,7 +843,6 @@ for frame in (frame0, frame1, frame2, frame3, frame4, frame5, frame6):
 
 # load the first frame
 load_frame0()
-
 
 # run app
 root.mainloop()
